@@ -1,26 +1,42 @@
-import React from 'react';
+import React from "react";
 
-import { TextField, Button, Checkbox } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { TextField, Button, Checkbox } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-export const AddField = ({addTask, checkbox, setCheckbox}) => { 
+export const AddField = ({ addTask }) => {
+  const [inputText, setInputText] = React.useState("");
+  const [inputCheckbox, setInputCheckbox] = React.useState(false);
+
+  const handleSubmit = () => {
+    addTask(inputText, inputCheckbox);
+    setInputText("");
+    setInputCheckbox(false);
+  };
+
   return (
-    <form onSubmit={(event) => addTask(event)} className="field">
+    <div className="field">
       <Checkbox
+        name="checkbox"
         type="checkbox"
-        checked={checkbox}
-        onChange={() => setCheckbox(!checkbox)}
         className="checkbox"
         icon={<RadioButtonUncheckedIcon />}
         checkedIcon={<CheckCircleIcon />}
-        name='checkbox'
+        checked={inputCheckbox}
+        onChange={(event) => setInputCheckbox(event.target.checked)}
       />
-      <TextField name="text" placeholder="Введите текст задачи..." variant="standard" fullWidth />
-      <Button type="submit">
+      <TextField
+        name="text"
+        placeholder="Введите текст задачи..."
+        variant="standard"
+        value={inputText}
+        onChange={(event) => setInputText(event.target.value)}
+        fullWidth
+      />
+      <Button onClick={handleSubmit}>
         <AddIcon />
       </Button>
-    </form>
+    </div>
   );
 };

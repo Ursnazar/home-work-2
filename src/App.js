@@ -9,26 +9,21 @@ import { Item } from "./components/Item";
 function reducer(tasks, action) {
   switch (action.type) {
     case "ADD_TASK":
-      const index = tasks.length - 1;
-      const lastId = tasks[index].id;
-      action.newTask.id = lastId + 1;
-      const newTask = action.newTask;
-      tasks = [...tasks, newTask];
-      return tasks;
-    case "TODO":
-      const index2 = tasks.findIndex((item) => item.id === action.id);
-      const newTask2 = tasks.slice();
-      newTask2[index2].completed = action.completed;
-      tasks = newTask2;
-      return tasks;
+      const lastId = !tasks.length ? 1 : tasks[tasks.length - 1].id + 1;
+      return [...tasks, { ...action.newTask, id: lastId }];
+    case "COMPLETE_TASK":
+      return tasks.map((item) => {
+        if (item.id === action.id) {
+          return { ...item, completed: action.completed };
+        }
+        return item;
+      });
     default:
       return tasks;
   }
 }
 
 function App() {
-  const [checkbox, setCheckbox] = React.useState(false);
-
   const [tasks, dispatch] = React.useReducer(reducer, [
     {
       id: 1,
@@ -37,27 +32,20 @@ function App() {
     },
   ]);
 
-  const addTask = (event) => {
-    event.preventDefault();
-
-    const completed = event.target.checkbox.checked;
-    const text = event.target.text.value;
-
+  const addTask = (inputText, inputChecbox) => {
     dispatch({
       type: "ADD_TASK",
       newTask: {
         id: "",
-        completed: completed,
-        text: text,
+        completed: inputChecbox,
+        text: inputText,
       },
     });
-    setCheckbox(false);
-    event.target.reset();
   };
 
-  const completeTask = (id, completed) => {
+  const completeTask = ({ id, completed }) => {
     dispatch({
-      type: "TODO",
+      type: "COMPLETE_TASK",
       id: id,
       completed: !completed,
     });
@@ -69,11 +57,7 @@ function App() {
         <Paper className="header" elevation={0}>
           <h4>Список задач</h4>
         </Paper>
-        <AddField
-          addTask={addTask}
-          checkbox={checkbox}
-          setCheckbox={setCheckbox}
-        />
+        <AddField addTask={addTask} />
         <Divider />
         <Tabs value={0}>
           <Tab label="Все" />
