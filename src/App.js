@@ -32,12 +32,12 @@ function App() {
     },
   ]);
 
-  const addTask = (inputText, inputChecbox) => {
+  const addTask = (inputText, inputCheckbox) => {
     dispatch({
       type: "ADD_TASK",
       newTask: {
         id: "",
-        completed: inputChecbox,
+        completed: inputCheckbox,
         text: inputText,
       },
     });
