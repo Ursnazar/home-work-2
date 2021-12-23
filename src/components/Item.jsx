@@ -6,7 +6,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-export const Item = ({ tasks, completeTask }) => {
+export const Item = ({ tasks, completeTask, deleteTask }) => {
   return (
     <React.Fragment>
       {tasks.map((task) => (
@@ -23,7 +23,7 @@ export const Item = ({ tasks, completeTask }) => {
               <IconButton>
                 <EditIcon style={{ fontSize: 20 }} />
               </IconButton>
-              <IconButton>
+              <IconButton onClick={() => deleteTask(task)}>
                 <DeleteOutlineIcon style={{ fontSize: 20 }} />
               </IconButton>
             </div>

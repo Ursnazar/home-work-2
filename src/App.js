@@ -10,14 +10,16 @@ function reducer(tasks, action) {
   switch (action.type) {
     case "ADD_TASK":
       const lastId = !tasks.length ? 1 : tasks[tasks.length - 1].id + 1;
-      return [...tasks, { ...action.newTask, id: lastId }];
+      return [...tasks, { ...action.payload, id: lastId }];
     case "COMPLETE_TASK":
       return tasks.map((item) => {
-        if (item.id === action.id) {
-          return { ...item, completed: action.completed };
+        if (item.id === action.payload.id) {
+          return { ...item, completed: action.payload.completed };
         }
         return item;
       });
+    case "DELETE_TASK":
+      return tasks.filter((task) => task.id !== action.payload);
     default:
       return tasks;
   }
@@ -35,7 +37,7 @@ function App() {
   const addTask = (inputText, inputCheckbox) => {
     dispatch({
       type: "ADD_TASK",
-      newTask: {
+      payload: {
         id: "",
         completed: inputCheckbox,
         text: inputText,
@@ -46,8 +48,17 @@ function App() {
   const completeTask = ({ id, completed }) => {
     dispatch({
       type: "COMPLETE_TASK",
-      id: id,
-      completed: !completed,
+      payload: {
+        id: id,
+        completed: !completed,
+      },
+    });
+  };
+
+  const deleteTask = ({ id }) => {
+    dispatch({
+      type: "DELETE_TASK",
+      payload: id,
     });
   };
 
@@ -66,7 +77,11 @@ function App() {
         </Tabs>
         <Divider />
         <List>
-          <Item tasks={tasks} completeTask={completeTask} />
+          <Item
+            tasks={tasks}
+            completeTask={completeTask}
+            deleteTask={deleteTask}
+          />
         </List>
         <Divider />
         <div className="check-buttons">
