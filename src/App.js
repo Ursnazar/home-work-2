@@ -56,10 +56,13 @@ function App() {
   };
 
   const deleteTask = ({ id }) => {
-    dispatch({
-      type: "DELETE_TASK",
-      payload: id,
-    });
+    let isOk = window.confirm("Вы точно хотите удалить задачу?");
+    if (isOk) {
+      dispatch({
+        type: "DELETE_TASK",
+        payload: id,
+      });
+    } else return;
   };
 
   return (
