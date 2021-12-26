@@ -6,7 +6,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-export const Item = ({ state, completeTask, deleteTask }) => {
+export const Item = ({ state, completeTask, deleteTask, editeTask }) => {
   return (
     <React.Fragment>
       {state.tasks
@@ -32,7 +32,7 @@ export const Item = ({ state, completeTask, deleteTask }) => {
               />
               <Typography className="item-text">{task.text}</Typography>
               <div className="item-buttons d-flex">
-                <IconButton>
+                <IconButton onClick={() => editeTask(task.id)}>
                   <EditIcon style={{ fontSize: 20 }} />
                 </IconButton>
                 <IconButton onClick={() => deleteTask(task)}>

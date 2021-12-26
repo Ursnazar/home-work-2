@@ -50,7 +50,16 @@ function reducer(state, action) {
         ...state,
         filterBy: action.payload,
       };
-
+    case "UPDATE_TASK":
+      return {
+        ...state,
+        tasks: state.tasks.map((task) => {
+          if (task.id === action.payload.id) {
+            task.text = action.payload.text;
+          }
+          return task;
+        }),
+      };
     default:
       return state.tasks;
   }
@@ -116,8 +125,7 @@ function App() {
   };
 
   const markAllTasks = () => {
-    setTextButton({ ...textButton, addMark: !textButton.addMark });
-    if (textButton.addMark) {
+    if (state.tasks.some((obj) => obj.completed == false)) {
       dispatch({
         type: "MARK_TASKS",
         payload: true,
@@ -128,6 +136,17 @@ function App() {
         payload: false,
       });
     }
+  };
+
+  const editeTask = (id) => {
+    const updateText = window.prompt("Введите новую задачу");
+    dispatch({
+      type: "UPDATE_TASK",
+      payload: {
+        id: id,
+        text: updateText,
+      },
+    });
   };
 
   const filterIndex = {
@@ -164,14 +183,17 @@ function App() {
             state={state}
             completeTask={completeTask}
             deleteTask={deleteTask}
+            editeTask={editeTask}
           />
         </List>
         <Divider />
         <div className="check-buttons">
-          <Button /* disabled={!state.tasks.length} */ onClick={markAllTasks}>
-            {textButton.addMark ? "Отметить всё" : "Снять отметки"}
+          <Button disabled={!state.tasks.length} onClick={markAllTasks}>
+            {state.tasks.every((obj) => obj.completed === true)
+              ? "Снять отметки"
+              : "Отметить всё"}
           </Button>
-          <Button /* disabled={!state.tasks.length} */ onClick={deleteAllTasks}>
+          <Button disabled={!state.tasks.length} onClick={deleteAllTasks}>
             Очистить
           </Button>
         </div>
