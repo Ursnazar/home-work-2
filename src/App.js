@@ -6,30 +6,53 @@ import { Paper, Divider, Button, List, Tabs, Tab } from "@mui/material";
 import { AddField } from "./components/AddField";
 import { Item } from "./components/Item";
 
-function reducer(tasks, action) {
+function reducer(state, action) {
   switch (action.type) {
     case "ADD_TASK":
-      const lastId = !tasks.length ? 1 : tasks[tasks.length - 1].id + 1;
-      return [...tasks, { ...action.payload, id: lastId }];
+      const lastId = !state.tasks.length
+        ? 1
+        : state.tasks[state.tasks.length - 1].id + 1;
+      return {
+        ...state,
+        tasks: [...state.tasks, { ...action.payload, id: lastId }],
+      };
     case "COMPLETE_TASK":
-      return tasks.map((item) => {
-        if (item.id === action.payload.id) {
-          return { ...item, completed: action.payload.completed };
-        }
-        return item;
-      });
+      return {
+        ...state,
+        tasks: state.tasks.map((task) => {
+          if (action.payload.id === task.id) {
+            task.completed = action.payload.completed;
+          }
+          return task;
+        }),
+      };
     case "DELETE_TASK":
-      return tasks.filter((task) => task.id !== action.payload);
+      return {
+        ...state,
+        tasks: state.tasks.filter((task) => task.id !== action.payload),
+      };
     case "REMOVE_ALL_TASKS":
-      return [];
+      return {
+        ...state,
+        tasks: (state.tasks = []),
+      };
     case "MARK_TASKS":
-      return tasks.map((item) => {
-        return action.payload
-          ? { ...item, completed: true }
-          : { ...item, completed: false };
-      });
+      return {
+        ...state,
+        tasks: state.tasks.map((item) => {
+          return action.payload
+            ? { ...item, completed: true }
+            : { ...item, completed: false };
+        }),
+      };
+    case "SET_FILTER":
+      return {
+        ...state,
+        filterBy: action.payload,
+      };
+
     default:
-      return tasks;
+      return state.tasks;
   }
 }
 
@@ -38,13 +61,21 @@ function App() {
     addMark: true,
   });
 
-  const [tasks, dispatch] = React.useReducer(reducer, [
-    {
-      id: 1,
-      text: "Task 1",
-      completed: false,
-    },
-  ]);
+  const [state, dispatch] = React.useReducer(reducer, {
+    filterBy: "all",
+    tasks: [
+      {
+        id: 1,
+        text: "Task 1",
+        completed: false,
+      },
+      {
+        id: 2,
+        text: "Task 2",
+        completed: false,
+      },
+    ],
+  });
 
   const addTask = (inputText, inputCheckbox) => {
     dispatch({
@@ -77,8 +108,7 @@ function App() {
   };
 
   const deleteAllTasks = () => {
-    let isOk = window.confirm("Вы точно хотите удалить все задачи?");
-    if (isOk) {
+    if (window.confirm("Вы точно хотите удалить все задачи?")) {
       dispatch({
         type: "REMOVE_ALL_TASKS",
       });
@@ -100,6 +130,21 @@ function App() {
     }
   };
 
+  const filterIndex = {
+    all: 0,
+    active: 1,
+    completed: 2,
+  };
+
+  const setFilter = (_, newIndex) => {
+    const status = Object.keys(filterIndex)[newIndex];
+    console.log(status);
+    dispatch({
+      type: "SET_FILTER",
+      payload: status,
+    });
+  };
+
   return (
     <div className="App">
       <Paper className="wrapper">
@@ -108,7 +153,7 @@ function App() {
         </Paper>
         <AddField addTask={addTask} />
         <Divider />
-        <Tabs value={0}>
+        <Tabs onChange={setFilter} value={filterIndex[state.filterBy]}>
           <Tab label="Все" />
           <Tab label="Активные" />
           <Tab label="Завершённые" />
@@ -116,17 +161,19 @@ function App() {
         <Divider />
         <List>
           <Item
-            tasks={tasks}
+            state={state}
             completeTask={completeTask}
             deleteTask={deleteTask}
           />
         </List>
         <Divider />
         <div className="check-buttons">
-          <Button onClick={markAllTasks}>
+          <Button /* disabled={!state.tasks.length} */ onClick={markAllTasks}>
             {textButton.addMark ? "Отметить всё" : "Снять отметки"}
           </Button>
-          <Button onClick={deleteAllTasks}>Очистить</Button>
+          <Button /* disabled={!state.tasks.length} */ onClick={deleteAllTasks}>
+            Очистить
+          </Button>
         </div>
       </Paper>
     </div>
