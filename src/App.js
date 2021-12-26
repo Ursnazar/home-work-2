@@ -20,12 +20,24 @@ function reducer(tasks, action) {
       });
     case "DELETE_TASK":
       return tasks.filter((task) => task.id !== action.payload);
+    case "REMOVE_ALL_TASKS":
+      return [];
+    case "MARK_TASKS":
+      return tasks.map((item) => {
+        return action.payload
+          ? { ...item, completed: true }
+          : { ...item, completed: false };
+      });
     default:
       return tasks;
   }
 }
 
 function App() {
+  const [textButton, setTextButton] = React.useState({
+    addMark: true,
+  });
+
   const [tasks, dispatch] = React.useReducer(reducer, [
     {
       id: 1,
@@ -56,13 +68,36 @@ function App() {
   };
 
   const deleteTask = ({ id }) => {
-    let isOk = window.confirm("Вы точно хотите удалить задачу?");
-    if (isOk) {
+    if (window.confirm("Вы точно хотите удалить задачу?")) {
       dispatch({
         type: "DELETE_TASK",
         payload: id,
       });
     } else return;
+  };
+
+  const deleteAllTasks = () => {
+    let isOk = window.confirm("Вы точно хотите удалить все задачи?");
+    if (isOk) {
+      dispatch({
+        type: "REMOVE_ALL_TASKS",
+      });
+    }
+  };
+
+  const markAllTasks = () => {
+    setTextButton({ ...textButton, addMark: !textButton.addMark });
+    if (textButton.addMark) {
+      dispatch({
+        type: "MARK_TASKS",
+        payload: true,
+      });
+    } else {
+      dispatch({
+        type: "MARK_TASKS",
+        payload: false,
+      });
+    }
   };
 
   return (
@@ -88,8 +123,10 @@ function App() {
         </List>
         <Divider />
         <div className="check-buttons">
-          <Button>Отметить всё</Button>
-          <Button>Очистить</Button>
+          <Button onClick={markAllTasks}>
+            {textButton.addMark ? "Отметить всё" : "Снять отметки"}
+          </Button>
+          <Button onClick={deleteAllTasks}>Очистить</Button>
         </div>
       </Paper>
     </div>
