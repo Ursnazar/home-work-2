@@ -1,12 +1,12 @@
 import React from "react";
 import { IconButton, Checkbox, ListItem, Typography } from "@mui/material";
-
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 export const Item = ({ state, completeTask, deleteTask, editeTask }) => {
+  console.log(state);
   return (
     <React.Fragment>
       {state.tasks
