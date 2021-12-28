@@ -5,11 +5,24 @@ import { Paper, Divider, Button, List } from "@mui/material";
 import { AddField } from "./components/AddField";
 import Filter from "./components/Filter";
 import { Item } from "./components/Item";
-import { addTask, completeTask, deleteTask } from "./redux/actions/task";
+import {
+  requestTasks,
+  addTask,
+  completeTask,
+  deleteTask,
+  deleteAllTasks,
+  markAllTasksComplete,
+  markAllTasksNotComplete,
+  editeTask,
+} from "./redux/actions/task";
 
 function App() {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(requestTasks());
+  }, []);
 
   const handleAddTask = (inputText, inputCheckbox) => {
     dispatch(addTask(inputText, inputCheckbox));
@@ -25,37 +38,23 @@ function App() {
     } else return;
   };
 
-  const deleteAllTasks = () => {
+  const handleDeleteAllTasks = () => {
     if (window.confirm("Вы точно хотите удалить все задачи?")) {
-      dispatch({
-        type: "REMOVE_ALL_TASKS",
-      });
-    }
+      dispatch(deleteAllTasks());
+    } else return;
   };
 
   const markAllTasks = () => {
     if (state.task.some((obj) => obj.completed === false)) {
-      dispatch({
-        type: "MARK_TASKS",
-        payload: true,
-      });
+      dispatch(markAllTasksComplete());
     } else {
-      dispatch({
-        type: "MARK_TASKS",
-        payload: false,
-      });
+      dispatch(markAllTasksNotComplete());
     }
   };
 
-  const editeTask = (id) => {
+  const handleEditeTask = (id) => {
     const updateText = window.prompt("Введите новую задачу");
-    dispatch({
-      type: "UPDATE_TASK",
-      payload: {
-        id: id,
-        text: updateText,
-      },
-    });
+    dispatch(editeTask(id, updateText));
   };
 
   return (
@@ -73,7 +72,7 @@ function App() {
             state={state}
             handleCompleteTask={handleCompleteTask}
             handleDeleteTask={handleDeleteTask}
-            editeTask={editeTask}
+            handleEditeTask={handleEditeTask}
           />
         </List>
         <Divider />
@@ -83,7 +82,7 @@ function App() {
               ? "Снять отметки"
               : "Отметить всё"}
           </Button>
-          <Button disabled={!state.task.length} onClick={deleteAllTasks}>
+          <Button disabled={!state.task.length} onClick={handleDeleteAllTasks}>
             Очистить
           </Button>
         </div>

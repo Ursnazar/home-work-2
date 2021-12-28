@@ -18,12 +18,14 @@ const initialState = [
 
 export function taskReducer(state = initialState, action) {
   switch (action.type) {
+    case "FETCH_TASKS":
+      return action.payload;
     case "ADD_TASK":
       const lastId = !state.length ? 1 : state[state.length - 1].id + 1;
       return [...state, { ...action.payload, id: lastId }];
     case "COMPLETE_TASK":
       return state.map((task) => {
-        if (action.payload.id == task.id) {
+        if (action.payload.id === task.id) {
           task.completed = action.payload.completed;
         }
         return task;

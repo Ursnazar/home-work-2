@@ -9,7 +9,7 @@ export const Item = ({
   state,
   handleCompleteTask,
   handleDeleteTask,
-  editeTask,
+  handleEditeTask,
 }) => {
   return (
     <React.Fragment>
@@ -36,7 +36,7 @@ export const Item = ({
               />
               <Typography className="item-text">{task.text}</Typography>
               <div className="item-buttons d-flex">
-                <IconButton onClick={() => editeTask(task.id)}>
+                <IconButton onClick={() => handleEditeTask(task.id)}>
                   <EditIcon style={{ fontSize: 20 }} />
                 </IconButton>
                 <IconButton onClick={() => handleDeleteTask(task)}>

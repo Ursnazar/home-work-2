@@ -1,4 +1,5 @@
-import { createStore, combineReducers } from "redux";
+import { createStore, combineReducers, applyMiddleware } from "redux";
+import thunk from "redux-thunk";
 import { taskReducer } from "./reducers/task";
 import { filterReducer } from "./reducers/filter";
 
@@ -7,7 +8,7 @@ const RootReducers = combineReducers({
   filter: filterReducer,
 });
 
-const store = createStore(RootReducers);
+const store = createStore(RootReducers, applyMiddleware(thunk));
 
 console.log(store.getState());
 
