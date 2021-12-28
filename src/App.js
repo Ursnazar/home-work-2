@@ -1,103 +1,60 @@
 import React from "react";
-
 import "./index.scss";
-
-import { Paper, Divider, Button, List, Tabs, Tab } from "@mui/material";
+import { useSelector, useDispatch } from "react-redux";
+import { Paper, Divider, Button, List } from "@mui/material";
 import { AddField } from "./components/AddField";
+import Filter from "./components/Filter";
 import { Item } from "./components/Item";
-
-function reducer(tasks, action) {
-  switch (action.type) {
-    case "ADD_TASK":
-      const lastId = !tasks.length ? 1 : tasks[tasks.length - 1].id + 1;
-      return [...tasks, { ...action.payload, id: lastId }];
-    case "COMPLETE_TASK":
-      return tasks.map((item) => {
-        if (item.id === action.payload.id) {
-          return { ...item, completed: action.payload.completed };
-        }
-        return item;
-      });
-    case "DELETE_TASK":
-      return tasks.filter((task) => task.id !== action.payload);
-    case "REMOVE_ALL_TASKS":
-      return [];
-    case "MARK_TASKS":
-      return tasks.map((item) => {
-        return action.payload
-          ? { ...item, completed: true }
-          : { ...item, completed: false };
-      });
-    default:
-      return tasks;
-  }
-}
+import {
+  requestTasks,
+  addTask,
+  completeTask,
+  deleteTask,
+  deleteAllTasks,
+  markAllTasksComplete,
+  markAllTasksNotComplete,
+  editeTask,
+} from "./redux/actions/task";
 
 function App() {
-  const [textButton, setTextButton] = React.useState({
-    addMark: true,
-  });
+  const state = useSelector((state) => state);
+  const dispatch = useDispatch();
 
-  const [tasks, dispatch] = React.useReducer(reducer, [
-    {
-      id: 1,
-      text: "Task 1",
-      completed: false,
-    },
-  ]);
+  React.useEffect(() => {
+    dispatch(requestTasks());
+  }, []);
 
-  const addTask = (inputText, inputCheckbox) => {
-    dispatch({
-      type: "ADD_TASK",
-      payload: {
-        id: "",
-        completed: inputCheckbox,
-        text: inputText,
-      },
-    });
+  const handleAddTask = (inputText, inputCheckbox) => {
+    dispatch(addTask(inputText, inputCheckbox));
   };
 
-  const completeTask = ({ id, completed }) => {
-    dispatch({
-      type: "COMPLETE_TASK",
-      payload: {
-        id: id,
-        completed: !completed,
-      },
-    });
+  const handleCompleteTask = ({ id, completed }) => {
+    dispatch(completeTask(id, completed));
   };
 
-  const deleteTask = ({ id }) => {
+  const handleDeleteTask = ({ id }) => {
     if (window.confirm("Вы точно хотите удалить задачу?")) {
-      dispatch({
-        type: "DELETE_TASK",
-        payload: id,
-      });
+      dispatch(deleteTask(id));
     } else return;
   };
 
-  const deleteAllTasks = () => {
-    let isOk = window.confirm("Вы точно хотите удалить все задачи?");
-    if (isOk) {
-      dispatch({
-        type: "REMOVE_ALL_TASKS",
-      });
-    }
+  const handleDeleteAllTasks = () => {
+    if (window.confirm("Вы точно хотите удалить все задачи?")) {
+      dispatch(deleteAllTasks());
+    } else return;
   };
 
   const markAllTasks = () => {
-    setTextButton({ ...textButton, addMark: !textButton.addMark });
-    if (textButton.addMark) {
-      dispatch({
-        type: "MARK_TASKS",
-        payload: true,
-      });
+    if (state.task.some((obj) => obj.completed === false)) {
+      dispatch(markAllTasksComplete());
     } else {
-      dispatch({
-        type: "MARK_TASKS",
-        payload: false,
-      });
+      dispatch(markAllTasksNotComplete());
     }
+  };
+
+  const handleEditeTask = (id) => {
+    const updateText = window.prompt("Введите новую задачу");
+    dispatch(editeTask(id, updateText));
   };
 
   return (
@@ -106,27 +63,28 @@ function App() {
         <Paper className="header" elevation={0}>
           <h4>Список задач</h4>
         </Paper>
-        <AddField addTask={addTask} />
+        <AddField handleAddTask={handleAddTask} />
         <Divider />
-        <Tabs value={0}>
-          <Tab label="Все" />
-          <Tab label="Активные" />
-          <Tab label="Завершённые" />
-        </Tabs>
+        <Filter />
         <Divider />
         <List>
           <Item
-            tasks={tasks}
-            completeTask={completeTask}
-            deleteTask={deleteTask}
+            state={state}
+            handleCompleteTask={handleCompleteTask}
+            handleDeleteTask={handleDeleteTask}
+            handleEditeTask={handleEditeTask}
           />
         </List>
         <Divider />
         <div className="check-buttons">
-          <Button onClick={markAllTasks}>
-            {textButton.addMark ? "Отметить всё" : "Снять отметки"}
+          <Button disabled={!state.task.length} onClick={markAllTasks}>
+            {state.task.every((obj) => obj.completed === true)
+              ? "Снять отметки"
+              : "Отметить всё"}
           </Button>
-          <Button onClick={deleteAllTasks}>Очистить</Button>
+          <Button disabled={!state.task.length} onClick={handleDeleteAllTasks}>
+            Очистить
+          </Button>
         </div>
       </Paper>
     </div>

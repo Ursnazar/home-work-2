@@ -1,16 +1,15 @@
 import React from "react";
-
 import { TextField, Button, Checkbox } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-export const AddField = ({ addTask }) => {
+export const AddField = ({ handleAddTask }) => {
   const [inputText, setInputText] = React.useState("");
   const [inputCheckbox, setInputCheckbox] = React.useState(false);
 
   const handleSubmit = () => {
-    addTask(inputText, inputCheckbox);
+    handleAddTask(inputText, inputCheckbox);
     setInputText("");
     setInputCheckbox(false);
   };
