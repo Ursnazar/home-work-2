@@ -5,19 +5,23 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
-export const Item = ({ state, completeTask, deleteTask, editeTask }) => {
-  console.log(state);
+export const Item = ({
+  state,
+  handleCompleteTask,
+  handleDeleteTask,
+  editeTask,
+}) => {
   return (
     <React.Fragment>
-      {state.tasks
+      {state.task
         .filter((obj) => {
-          if (state.filterBy === "all") {
+          if (state.filter.filterBy === "all") {
             return true;
           }
-          if (state.filterBy === "completed") {
+          if (state.filter.filterBy === "completed") {
             return obj.completed;
           }
-          if (state.filterBy === "active") {
+          if (state.filter.filterBy === "active") {
             return !obj.completed;
           }
         })
@@ -26,7 +30,7 @@ export const Item = ({ state, completeTask, deleteTask, editeTask }) => {
             <div className="d-flex item">
               <Checkbox
                 icon={<RadioButtonUncheckedIcon />}
-                onChange={() => completeTask(task)}
+                onChange={() => handleCompleteTask(task)}
                 checked={task.completed}
                 checkedIcon={<CheckCircleIcon />}
               />
@@ -35,7 +39,7 @@ export const Item = ({ state, completeTask, deleteTask, editeTask }) => {
                 <IconButton onClick={() => editeTask(task.id)}>
                   <EditIcon style={{ fontSize: 20 }} />
                 </IconButton>
-                <IconButton onClick={() => deleteTask(task)}>
+                <IconButton onClick={() => handleDeleteTask(task)}>
                   <DeleteOutlineIcon style={{ fontSize: 20 }} />
                 </IconButton>
               </div>

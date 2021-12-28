@@ -1,43 +1,27 @@
 import React from "react";
 import "./index.scss";
 import { useSelector, useDispatch } from "react-redux";
-import { Paper, Divider, Button, List, Tabs, Tab } from "@mui/material";
+import { Paper, Divider, Button, List } from "@mui/material";
 import { AddField } from "./components/AddField";
+import Filter from "./components/Filter";
 import { Item } from "./components/Item";
+import { addTask, completeTask, deleteTask } from "./redux/actions/task";
 
 function App() {
   const state = useSelector((state) => state);
   const dispatch = useDispatch();
 
-  console.log(state);
-
-  const addTask = (inputText, inputCheckbox) => {
-    dispatch({
-      type: "ADD_TASK",
-      payload: {
-        id: "",
-        completed: inputCheckbox,
-        text: inputText,
-      },
-    });
+  const handleAddTask = (inputText, inputCheckbox) => {
+    dispatch(addTask(inputText, inputCheckbox));
   };
 
-  const completeTask = ({ id, completed }) => {
-    dispatch({
-      type: "COMPLETE_TASK",
-      payload: {
-        id: id,
-        completed: !completed,
-      },
-    });
+  const handleCompleteTask = ({ id, completed }) => {
+    dispatch(completeTask(id, completed));
   };
 
-  const deleteTask = ({ id }) => {
+  const handleDeleteTask = ({ id }) => {
     if (window.confirm("Вы точно хотите удалить задачу?")) {
-      dispatch({
-        type: "DELETE_TASK",
-        payload: id,
-      });
+      dispatch(deleteTask(id));
     } else return;
   };
 
@@ -50,7 +34,7 @@ function App() {
   };
 
   const markAllTasks = () => {
-    if (state.tasks.some((obj) => obj.completed == false)) {
+    if (state.task.some((obj) => obj.completed === false)) {
       dispatch({
         type: "MARK_TASKS",
         payload: true,
@@ -74,51 +58,32 @@ function App() {
     });
   };
 
-  const filterIndex = {
-    all: 0,
-    active: 1,
-    completed: 2,
-  };
-
-  const setFilter = (_, newIndex) => {
-    const status = Object.keys(filterIndex)[newIndex];
-    console.log(status);
-    dispatch({
-      type: "SET_FILTER",
-      payload: status,
-    });
-  };
-
   return (
     <div className="App">
       <Paper className="wrapper">
         <Paper className="header" elevation={0}>
           <h4>Список задач</h4>
         </Paper>
-        <AddField addTask={addTask} />
+        <AddField handleAddTask={handleAddTask} />
         <Divider />
-        <Tabs onChange={setFilter} value={filterIndex[state.filterBy]}>
-          <Tab label="Все" />
-          <Tab label="Активные" />
-          <Tab label="Завершённые" />
-        </Tabs>
+        <Filter />
         <Divider />
         <List>
           <Item
             state={state}
-            completeTask={completeTask}
-            deleteTask={deleteTask}
+            handleCompleteTask={handleCompleteTask}
+            handleDeleteTask={handleDeleteTask}
             editeTask={editeTask}
           />
         </List>
         <Divider />
         <div className="check-buttons">
-          <Button disabled={!state.tasks.length} onClick={markAllTasks}>
-            {state.tasks.every((obj) => obj.completed === true)
+          <Button disabled={!state.task.length} onClick={markAllTasks}>
+            {state.task.every((obj) => obj.completed === true)
               ? "Снять отметки"
               : "Отметить всё"}
           </Button>
-          <Button disabled={!state.tasks.length} onClick={deleteAllTasks}>
+          <Button disabled={!state.task.length} onClick={deleteAllTasks}>
             Очистить
           </Button>
         </div>
